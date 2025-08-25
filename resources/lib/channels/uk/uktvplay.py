@@ -230,7 +230,19 @@ def get_video_url(plugin, item_id, data_video_id, show_name, **kwargs):
     data_account = "1242911124001"
     data_player = "0RyQs9qPh"
 
-    return resolver_proxy.get_brightcove_video_json(plugin, data_account, data_player, data_video_id)
+    li = resolver_proxy.get_brightcove_video_json(plugin, data_account, data_player, data_video_id)
+
+    # Currently (Kodi 21.2), vtt inband subtitles from U are not shown.
+    # However, if the same subtitle url is passed to Kodi separately, it does work.
+    if plugin.setting.get_boolean('active_subtitle'):
+        resp = urlquick.get(li.path, headers=GENERIC_HEADERS, max_age=-1)
+        dash_manifest = resp.text
+        # Find the subtitles url in the manifest.
+        match = re.search(r'<AdaptationSet mimeType="text/vtt"[^>]*>.+?<BaseURL>(.+?)</BaseURL>',
+                          dash_manifest, re.DOTALL)
+        if match:
+            li.subtitles.append(match[1])
+    return li
 
 
 @Resolver.register
