@@ -1,8 +1,7 @@
 name: Pull request check
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 
 jobs:
@@ -37,7 +36,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           path: simulator
-          repository: Catch-up-TV-and-More/catchuptvandmore-test
+          repository: dimkroon/catchuptvandmore-test
       - name: Set up Python 3.8
         uses: actions/setup-python@v7
         with:
